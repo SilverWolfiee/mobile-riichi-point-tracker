@@ -32,6 +32,11 @@ class WinPayments {
   });
 }
 
+int ronHonbaBonus(int honba) => honba * 300;
+Map<String, int> tsumoHonbaBonus(int honba) {
+  final perPlayer = honba * 100;
+  return {'perPlayer': perPlayer};
+}
 WinPayments calculateRonPayment({
   required int han,
   required int fu,

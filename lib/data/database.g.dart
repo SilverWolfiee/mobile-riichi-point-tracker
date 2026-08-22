@@ -712,7 +712,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
   }
 }
 
-class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
+class $EventsTable extends Events with TableInfo<$EventsTable, GameEventRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -809,7 +809,7 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
   static const String $name = 'events';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Event> instance, {
+    Insertable<GameEventRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -874,9 +874,9 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Event map(Map<String, dynamic> data, {String? tablePrefix}) {
+  GameEventRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Event(
+    return GameEventRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -914,7 +914,7 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
   }
 }
 
-class Event extends DataClass implements Insertable<Event> {
+class GameEventRow extends DataClass implements Insertable<GameEventRow> {
   final String id;
   final String tableId;
   final int roundNumber;
@@ -922,7 +922,7 @@ class Event extends DataClass implements Insertable<Event> {
   final String type;
   final String payload;
   final DateTime createdAt;
-  const Event({
+  const GameEventRow({
     required this.id,
     required this.tableId,
     required this.roundNumber,
@@ -956,12 +956,12 @@ class Event extends DataClass implements Insertable<Event> {
     );
   }
 
-  factory Event.fromJson(
+  factory GameEventRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Event(
+    return GameEventRow(
       id: serializer.fromJson<String>(json['id']),
       tableId: serializer.fromJson<String>(json['tableId']),
       roundNumber: serializer.fromJson<int>(json['roundNumber']),
@@ -985,7 +985,7 @@ class Event extends DataClass implements Insertable<Event> {
     };
   }
 
-  Event copyWith({
+  GameEventRow copyWith({
     String? id,
     String? tableId,
     int? roundNumber,
@@ -993,7 +993,7 @@ class Event extends DataClass implements Insertable<Event> {
     String? type,
     String? payload,
     DateTime? createdAt,
-  }) => Event(
+  }) => GameEventRow(
     id: id ?? this.id,
     tableId: tableId ?? this.tableId,
     roundNumber: roundNumber ?? this.roundNumber,
@@ -1002,8 +1002,8 @@ class Event extends DataClass implements Insertable<Event> {
     payload: payload ?? this.payload,
     createdAt: createdAt ?? this.createdAt,
   );
-  Event copyWithCompanion(EventsCompanion data) {
-    return Event(
+  GameEventRow copyWithCompanion(EventsCompanion data) {
+    return GameEventRow(
       id: data.id.present ? data.id.value : this.id,
       tableId: data.tableId.present ? data.tableId.value : this.tableId,
       roundNumber: data.roundNumber.present
@@ -1018,7 +1018,7 @@ class Event extends DataClass implements Insertable<Event> {
 
   @override
   String toString() {
-    return (StringBuffer('Event(')
+    return (StringBuffer('GameEventRow(')
           ..write('id: $id, ')
           ..write('tableId: $tableId, ')
           ..write('roundNumber: $roundNumber, ')
@@ -1036,7 +1036,7 @@ class Event extends DataClass implements Insertable<Event> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Event &&
+      (other is GameEventRow &&
           other.id == this.id &&
           other.tableId == this.tableId &&
           other.roundNumber == this.roundNumber &&
@@ -1046,7 +1046,7 @@ class Event extends DataClass implements Insertable<Event> {
           other.createdAt == this.createdAt);
 }
 
-class EventsCompanion extends UpdateCompanion<Event> {
+class EventsCompanion extends UpdateCompanion<GameEventRow> {
   final Value<String> id;
   final Value<String> tableId;
   final Value<int> roundNumber;
@@ -1080,7 +1080,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
        honba = Value(honba),
        type = Value(type),
        payload = Value(payload);
-  static Insertable<Event> custom({
+  static Insertable<GameEventRow> custom({
     Expression<String>? id,
     Expression<String>? tableId,
     Expression<int>? roundNumber,
@@ -1225,7 +1225,7 @@ final class $$TablesTableReferences
     );
   }
 
-  static MultiTypedResultKey<$EventsTable, List<Event>> _eventsRefsTable(
+  static MultiTypedResultKey<$EventsTable, List<GameEventRow>> _eventsRefsTable(
     _$AppDatabase db,
   ) => MultiTypedResultKey.fromTable(
     db.events,
@@ -1545,7 +1545,11 @@ class $$TablesTableTableManager
                       typedResults: items,
                     ),
                   if (eventsRefs)
-                    await $_getPrefetchedData<GameTable, $TablesTable, Event>(
+                    await $_getPrefetchedData<
+                      GameTable,
+                      $TablesTable,
+                      GameEventRow
+                    >(
                       currentTable: table,
                       referencedTable: $$TablesTableReferences._eventsRefsTable(
                         db,
@@ -1895,7 +1899,7 @@ typedef $$EventsTableUpdateCompanionBuilder = EventsCompanion Function({
 });
 
 final class $$EventsTableReferences
-    extends BaseReferences<_$AppDatabase, $EventsTable, Event> {
+    extends BaseReferences<_$AppDatabase, $EventsTable, GameEventRow> {
   $$EventsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $TablesTable _tableIdTable(_$AppDatabase db) =>
@@ -2100,14 +2104,14 @@ class $$EventsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $EventsTable,
-          Event,
+          GameEventRow,
           $$EventsTableFilterComposer,
           $$EventsTableOrderingComposer,
           $$EventsTableAnnotationComposer,
           $$EventsTableCreateCompanionBuilder,
           $$EventsTableUpdateCompanionBuilder,
-          (Event, $$EventsTableReferences),
-          Event,
+          (GameEventRow, $$EventsTableReferences),
+          GameEventRow,
           PrefetchHooks Function({bool tableId})
         > {
   $$EventsTableTableManager(_$AppDatabase db, $EventsTable table)
@@ -2215,14 +2219,14 @@ typedef $$EventsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $EventsTable,
-      Event,
+      GameEventRow,
       $$EventsTableFilterComposer,
       $$EventsTableOrderingComposer,
       $$EventsTableAnnotationComposer,
       $$EventsTableCreateCompanionBuilder,
       $$EventsTableUpdateCompanionBuilder,
-      (Event, $$EventsTableReferences),
-      Event,
+      (GameEventRow, $$EventsTableReferences),
+      GameEventRow,
       PrefetchHooks Function({bool tableId})
     >;
 

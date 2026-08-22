@@ -29,7 +29,7 @@ class Players extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
-
+@DataClassName('GameEventRow')
 class Events extends Table {
   TextColumn get id => text()();
   TextColumn get tableId => text().references(Tables, #id)();

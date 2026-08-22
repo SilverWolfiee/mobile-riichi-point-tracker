@@ -24,12 +24,9 @@ void main() async {
     ),
   );
 
-  final tables = await db.select(db.tables).get();
-  final players = await db.select(db.players).get();
+  
 
-  print('Tables: $tables');
-  print('Players: $players');
-
+ 
   runApp(const MyApp());
 }
 
