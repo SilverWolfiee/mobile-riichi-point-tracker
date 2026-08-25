@@ -47,6 +47,12 @@ class TablesRepository {
     return (tableId: tableId, playerIds: playerIds);
   }
 
+  Future<GameTable?> getTable(String tableId) {
+    return (db.select(
+      db.tables,
+    )..where((t) => t.id.equals(tableId))).getSingleOrNull();
+  }
+
   Future<List<GameTable>> listTables() {
     return (db.select(
       db.tables,
@@ -63,5 +69,11 @@ class TablesRepository {
     return (db.update(db.tables)..where((t) => t.id.equals(tableId))).write(
       const TablesCompanion(status: Value('finished')),
     );
+  }
+
+  Future<void> deleteTable(String tableId) async {
+    await (db.delete(db.events)..where((e) => e.tableId.equals(tableId))).go();
+    await (db.delete(db.players)..where((p) => p.tableId.equals(tableId))).go();
+    await (db.delete(db.tables)..where((t) => t.id.equals(tableId))).go();
   }
 }

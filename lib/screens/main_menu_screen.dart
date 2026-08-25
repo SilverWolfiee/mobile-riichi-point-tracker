@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riichi_tracker/screens/active_table_screen.dart';
+
 
 import 'create_table_screen.dart';
 import '../data/database.dart';
@@ -147,43 +149,82 @@ class _TableList extends StatelessWidget {
   }
 }
 
-class _TableCard extends StatelessWidget {
+class _TableCard extends ConsumerWidget {
   final GameTable table;
 
   const _TableCard({required this.table});
 
   @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surface,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadii.md),
-        side: const BorderSide(color: AppColors.border),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.xs,
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+      onLongPress: () => _confirmDelete(context, ref),
+      child: Material(
+        color: AppColors.surface,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadii.md),
+          side: const BorderSide(color: AppColors.border),
         ),
-        title: Text(
-          '${table.mode.toUpperCase()} · ${table.length.toUpperCase()}',
-          style: const TextStyle(
-            color: AppColors.pinkPrimary,
-            fontWeight: FontWeight.w800,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.xs,
           ),
+          title: Text(
+            '${table.mode.toUpperCase()} · ${table.length.toUpperCase()}',
+            style: const TextStyle(
+              color: AppColors.pinkPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          subtitle: Text(
+            'Created ${_formatDate(table.createdAt)}',
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+          ),
+          trailing: const Icon(
+            Icons.chevron_right,
+            color: AppColors.textSecondary,
+          ),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => ActiveTableScreen(tableId: table.id),
+              ),
+            );
+          },
         ),
-        subtitle: Text(
-          'Created ${_formatDate(table.createdAt)}',
-          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadii.lg),
+          side: const BorderSide(color: AppColors.border),
         ),
-        trailing: const Icon(
-          Icons.chevron_right,
-          color: AppColors.textSecondary,
+        title: const Text('Delete this table?', style: TextStyle(color: AppColors.textPrimary)),
+        content: const Text(
+          'This permanently deletes the table and all its history.',
+          style: TextStyle(color: AppColors.textSecondary),
         ),
-        onTap: () {
-          // TODO: navigate to active table screen once built
-        },
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          TextButton(
+            onPressed: () async {
+              await ref.read(tablesRepositoryProvider).deleteTable(table.id);
+              ref.invalidate(tablesListProvider);
+              if (context.mounted) Navigator.of(context).pop();
+            },
+            child: const Text('Delete', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w800)),
+          ),
+        ],
       ),
     );
   }
