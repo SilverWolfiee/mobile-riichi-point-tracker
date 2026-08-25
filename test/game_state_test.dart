@@ -170,4 +170,35 @@ void main() {
       expect(state.roundState.honba, 0);
     });
   });
+  group('riichiDeclaredIds tracking', () {
+  test('riichi adds to declared set', () {
+    final state = applyEvents(
+      events: const [
+        GameEvent(type: 'RIICHI_DECLARED', roundNumber: 1, honba: 0, payload: {'playerId': 'p2'}),
+      ],
+      playerIdsInSeatOrder: players,
+      startingScore: 25000,
+      length: GameLength.hanchan,
+    );
+    expect(state.riichiDeclaredIds, {'p2'});
+  });
+
+  test('riichi set clears after a win', () {
+    final state = applyEvents(
+      events: const [
+        GameEvent(type: 'RIICHI_DECLARED', roundNumber: 1, honba: 0, payload: {'playerId': 'p2'}),
+        GameEvent(
+          type: 'WIN',
+          roundNumber: 1,
+          honba: 0,
+          payload: {'winnerId': 'p3', 'isTsumo': false, 'loserId': 'p2', 'han': 3, 'fu': 30},
+        ),
+      ],
+      playerIdsInSeatOrder: players,
+      startingScore: 25000,
+      length: GameLength.hanchan,
+    );
+    expect(state.riichiDeclaredIds, isEmpty);
+  });
+});
 }

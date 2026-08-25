@@ -1,33 +1,14 @@
 import 'package:flutter/material.dart';
-import 'data/database.dart';
 
-void main() async {
+import 'theme/app_theme.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'screens/main_menu_screen.dart';
+
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  final db = AppDatabase();
-
-  final tableId = 'test-table-1';
-  await db.into(db.tables).insert(
-    TablesCompanion.insert(
-      id: tableId,
-      mode: 'yonma',
-      length: 'hanchan',
-    ),
-  );
-
-  await db.into(db.players).insert(
-    PlayersCompanion.insert(
-      id: 'p1',
-      tableId: tableId,
-      seat: 'E',
-      name: 'Rycene',
-    ),
-  );
-
-  
-
- 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -37,15 +18,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Riichi Tracker',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('DB smoke test ran — check the debug console'),
-        ),
-      ),
+      theme: buildAppTheme(),
+      home: const MainMenuScreen(),
     );
   }
 }

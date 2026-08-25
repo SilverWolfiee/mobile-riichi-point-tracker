@@ -1,4 +1,3 @@
-// import 'package:riichi_tracker/data/database.dart';
 import 'package:riichi_tracker/scoring/game_event.dart';
 
 import 'score_calculator.dart';
@@ -8,11 +7,23 @@ import 'round_state.dart';
 class GameState {
   final Map<String, int> scores;
   final RoundState roundState;
-  const GameState({required this.scores, required this.roundState});
-  GameState copyWith({Map<String, int>? scores, RoundState? roundState}) {
+  final Set<String> riichiDeclaredIds;
+
+  const GameState({
+    required this.scores,
+    required this.roundState,
+    this.riichiDeclaredIds = const {},
+  });
+
+  GameState copyWith({
+    Map<String, int>? scores,
+    RoundState? roundState,
+    Set<String>? riichiDeclaredIds,
+  }) {
     return GameState(
       scores: scores ?? this.scores,
       roundState: roundState ?? this.roundState,
+      riichiDeclaredIds: riichiDeclaredIds ?? this.riichiDeclaredIds,
     );
   }
 }
@@ -71,6 +82,7 @@ GameState _applyEvent({
         roundState: state.roundState.copyWith(
           riichiSticksPot: state.roundState.riichiSticksPot + 1000,
         ),
+        riichiDeclaredIds: {...state.riichiDeclaredIds, playerId},
       );
     case 'WIN':
       final winnerId = event.payload['winnerId'] as String;
@@ -84,7 +96,9 @@ GameState _applyEvent({
       final scores = Map<String, int>.from(state.scores);
 
       if (isTsumo) {
-        final others = playerIdsInSeatOrder.where((id) => id != winnerId).toList();
+        final others = playerIdsInSeatOrder
+            .where((id) => id != winnerId)
+            .toList();
         final nonDealerIds = others.where((id) => id != dealerId).toList();
         final payments = calculateTsumoPayment(
           han: han,
@@ -124,7 +138,9 @@ GameState _applyEvent({
 
       return GameState(scores: scores, roundState: nextRound);
     case 'EXHAUSTIVE_DRAW':
-      final tenpaiIds = List<String>.from(event.payload['tenpaiPlayerIds'] as List);
+      final tenpaiIds = List<String>.from(
+        event.payload['tenpaiPlayerIds'] as List,
+      );
       final payments = calculateNotenPayments(
         allPlayerIds: playerIdsInSeatOrder,
         tenpaiPlayerIds: tenpaiIds,
@@ -145,7 +161,7 @@ GameState _applyEvent({
         startingScore: startingScore,
       );
 
-      return GameState(scores: scores, roundState: nextRound);
+      return GameState(scores: scores, roundState: nextRound, riichiDeclaredIds: {});
 
     case 'POINT_ADJUSTMENT':
       final playerId = event.payload['playerId'] as String;
@@ -153,10 +169,22 @@ GameState _applyEvent({
       final scores = Map<String, int>.from(state.scores);
       scores[playerId] = scores[playerId]! + delta;
       return state.copyWith(scores: scores);
-
+    case 'FORCE_END':
+      final nextRound = resolveRoundEnd(
+        current: state.roundState,
+        length: length,
+        dealerWon: false,
+        isDraw: false,
+        dealerTenpai: false,
+        anyWin: false,
+        scoresAfterHand: playerIdsInSeatOrder
+            .map((id) => state.scores[id]!)
+            .toList(),
+        startingScore: startingScore,
+        forceEnd: true,
+      );
+      return GameState(scores: state.scores, roundState: nextRound);
     default:
       return state;
-    
   }
-
 }
