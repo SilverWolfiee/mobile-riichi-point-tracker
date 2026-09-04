@@ -124,11 +124,31 @@ class _TableList extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               if (onCreate != null) ...[
-                const SizedBox(height: AppSpacing.lg),
-                ElevatedButton.icon(
+                const SizedBox(height: AppSpacing.md),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.pinkAccent,
+                    foregroundColor: AppColors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.sm,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadii.md),
+                    ),
+                  ),
                   onPressed: onCreate,
-                  icon: const Icon(Icons.add),
-                  label: const Text('New Table'),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add, size: 18),
+                      SizedBox(width: AppSpacing.xs),
+                      Text(
+                        'New Table',
+                        style: TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ],
@@ -148,7 +168,6 @@ class _TableList extends StatelessWidget {
     );
   }
 }
-
 class _TableCard extends ConsumerWidget {
   final GameTable table;
 
